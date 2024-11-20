@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 DEBUG=false
 
 main() {
@@ -99,6 +98,7 @@ list_files() {
 
     ignored+=(".git")
     ignored+=("${ignore[@]}")
+    ignored+=("CHANGELOG.md")
 
     local find_command="find . -type f"
 
