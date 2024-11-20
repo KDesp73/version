@@ -9,25 +9,23 @@ function _version
         set COMP_CWORD (count $COMP_WORDS)
     end
 
-    set literals "autocomplete" "generate" "man" "-h" "--version" "::=" "update" "--help" "init" "-v"
+    set literals "autocomplete" "generate" "man" "-h" "--version" "update" "--help" "init" "-v"
 
     set descriptions
     set descriptions[2] "Generate various files"
     set descriptions[4] "Prints the help message"
     set descriptions[5] "Prints the script's version"
-    set descriptions[7] "Update the project version"
-    set descriptions[8] "Prints the help message"
-    set descriptions[9] "Initializes the version config file"
-    set descriptions[10] "Prints the script's version"
+    set descriptions[6] "Update the project version"
+    set descriptions[7] "Prints the help message"
+    set descriptions[8] "Initializes the version config file"
+    set descriptions[9] "Prints the script's version"
 
     set literal_transitions
-    set literal_transitions[1] "set inputs 7 2 9; set tos 2 3 2"
-    set literal_transitions[3] "set inputs 1 3 5 10; set tos 6 6 2 2"
-    set literal_transitions[4] "set inputs 6; set tos 5"
-    set literal_transitions[5] "set inputs 4 8; set tos 2 2"
+    set literal_transitions[1] "set inputs 8 6 7 2 4 5 9; set tos 2 2 2 3 2 2 2"
+    set literal_transitions[3] "set inputs 1 3; set tos 2 2"
 
-    set match_anything_transitions_from 6 1
-    set match_anything_transitions_to 4 2
+    set match_anything_transitions_from 
+    set match_anything_transitions_to 
 
     set state 1
     set word_index 2

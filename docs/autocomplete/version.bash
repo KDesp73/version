@@ -7,13 +7,11 @@ _version () {
     local words cword
     _get_comp_words_by_ref -n "$COMP_WORDBREAKS" words cword
 
-    declare -a literals=(autocomplete generate man -h --version ::= update --help init -v)
+    declare -a literals=(autocomplete generate man -h --version update --help init -v)
     declare -A literal_transitions=()
-    literal_transitions[0]="([6]=1 [1]=2 [8]=1)"
-    literal_transitions[2]="([0]=5 [2]=5 [4]=1 [9]=1)"
-    literal_transitions[3]="([5]=4)"
-    literal_transitions[4]="([3]=1 [7]=1)"
-    declare -A match_anything_transitions=([5]=3 [0]=1)
+    literal_transitions[0]="([7]=1 [5]=1 [6]=1 [1]=2 [3]=1 [4]=1 [8]=1)"
+    literal_transitions[2]="([0]=1 [2]=1)"
+    declare -A match_anything_transitions=()
     declare -A subword_transitions
 
     local state=0
@@ -50,7 +48,7 @@ _version () {
         return 1
     done
 
-    declare -A literal_transitions_level_0=([4]="3 7" [3]="5" [2]="0 2 4 9" [0]="6 1 8")
+    declare -A literal_transitions_level_0=([2]="0 2" [0]="7 5 6 1 3 4 8")
     declare -A subword_transitions_level_0=()
     declare -A commands_level_0=()
     declare -A specialized_commands_level_0=()

@@ -1,25 +1,23 @@
 #compdef version
 
 _version () {
-    local -a literals=("autocomplete" "generate" "man" "-h" "--version" "::=" "update" "--help" "init" "-v")
+    local -a literals=("autocomplete" "generate" "man" "-h" "--version" "update" "--help" "init" "-v")
 
     local -A descriptions
     descriptions[2]="Generate various files"
     descriptions[4]="Prints the help message"
     descriptions[5]="Prints the script's version"
-    descriptions[7]="Update the project version"
-    descriptions[8]="Prints the help message"
-    descriptions[9]="Initializes the version config file"
-    descriptions[10]="Prints the script's version"
+    descriptions[6]="Update the project version"
+    descriptions[7]="Prints the help message"
+    descriptions[8]="Initializes the version config file"
+    descriptions[9]="Prints the script's version"
 
     local -A literal_transitions
-    literal_transitions[1]="([7]=2 [2]=3 [9]=2)"
-    literal_transitions[3]="([1]=6 [3]=6 [5]=2 [10]=2)"
-    literal_transitions[4]="([6]=5)"
-    literal_transitions[5]="([4]=2 [8]=2)"
+    literal_transitions[1]="([8]=2 [6]=2 [7]=2 [2]=3 [4]=2 [5]=2 [9]=2)"
+    literal_transitions[3]="([1]=2 [3]=2)"
 
     local -A match_anything_transitions
-    match_anything_transitions=([6]=4 [1]=2)
+    match_anything_transitions=()
 
     declare -A subword_transitions
 
@@ -55,7 +53,7 @@ _version () {
 
         return 1
     done
-    declare -A literal_transitions_level_0=([5]="4 8" [4]="6" [3]="1 3 5 10" [1]="7 2 9")
+    declare -A literal_transitions_level_0=([3]="1 3" [1]="8 6 7 2 4 5 9")
     declare -A subword_transitions_level_0=()
     declare -A commands_level_0=()
     declare -A specialized_commands_level_0=()

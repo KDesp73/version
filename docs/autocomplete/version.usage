@@ -5,7 +5,7 @@ version <COMMANDS> | [<OPTIONS>];
              | (generate <GENERATE-VALUES>) "Generate various files"
              ;
 
-<GENERATE-VALUES> ::= (autocomplete | man)
+<GENERATE-VALUES> ::= (autocomplete | man);
 
 <OPTIONS> ::= (-h | --help) "Prints the help message"
             | (-v | --version) "Prints the script's version"
