@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+main() {
+    list_files
+}
+
+# Config
+
+VERSION_FILE=".version.conf"
+
+# Logging
+
+LOG () {
+    echo "[$1] $2"
+}
+INFO () {
+    LOG "INFO" "$1"
+}
+ERRO () {
+    LOG "ERRO" "$1"
+}
+WARN () {
+    LOG "WARN" "$1"
+}
+
+# Utils
+
+list_files_recursively() {
+    local ignored=("$@")
+    local find_command="find . -type f"
+
+    for ignore in "${ignored[@]}"; do
+        find_command+=" -not -path './$ignore/*' -not -name '$ignore'"
+    done
+
+    eval "$find_command"
+}
+
+# Commands
+
+command_init() {
+    touch "$VERSION_FILE"
+}
+
+
+main "$@"
