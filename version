@@ -1,12 +1,44 @@
 #!/usr/bin/env bash
 
 main() {
-    list_files
+    if [ "$#" == 0 ]; then
+        ERRO "A command or an option  is always expected" >&2
+        command_help
+        exit 1
+    fi
+
+    while [[ $# -gt 0 ]]; do
+        arg="$1"
+        case $arg in
+            -h|--help) 
+                command_help
+                shift
+                ;;
+            -v|--version) 
+                command_version 
+                shift
+                ;;
+            "init")
+                command_init
+                shift
+                ;;
+            "update")
+                shift
+                command_update "$1"
+                shift
+                ;;
+            *)
+                echo "Unknown command: $arg" >&2
+                command_help
+                exit 1
+        esac
+    done
 }
 
 # Config
 
 VERSION_FILE=".version.conf"
+VERSION="0.1.0"
 
 # Logging
 
@@ -22,15 +54,32 @@ ERRO () {
 WARN () {
     LOG "WARN" "$1"
 }
+DEBU () {
+    LOG "DEBU" "$1"
+}
 
 # Utils
 
-list_files_recursively() {
+list_files() {
+    local gitignore_file=".gitignore"
     local ignored=("$@")
+
+    # Add patterns from .gitignore if it exists
+    if [[ -f "$gitignore_file" ]]; then
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            [[ -z "$line" || "$line" == \#* ]] && continue
+            ignored+=("$line")
+        done < "$gitignore_file"
+    fi
+
+    ignored+=(".git")
+
+    # Build the find command
     local find_command="find . -type f"
 
     for ignore in "${ignored[@]}"; do
-        find_command+=" -not -path './$ignore/*' -not -name '$ignore'"
+        # Handle patterns that are directories or general patterns
+        find_command+=" -not -path './$ignore' -not -path './$ignore/*'"
     done
 
     eval "$find_command"
@@ -39,8 +88,41 @@ list_files_recursively() {
 # Commands
 
 command_init() {
-    touch "$VERSION_FILE"
+    if [[ -f "$VERSION_FILE" ]]; then
+        ERRO "$VERSION_FILE already exists in this directory"
+    else 
+        touch "$VERSION_FILE"
+        INFO "$VERSION_FILE created"
+    fi
 }
 
+command_update() {
+    version="$1"
+    files=$(list_files)
+
+    DEBU "new version: $version"
+    echo "$files"
+}
+
+command_help() {
+    cat <<EOF
+USAGE
+    version <COMMAND> [<OPTIONS>...]
+
+COMMANDS
+    init                Initializes the version config file
+    update              Update the project version
+
+OPTIONS
+    -h --help           Prints this message
+    -v --version        Prints the version tool's version
+
+Made by KDesp73 <despoinidisk@gmail.com>
+EOF
+}
+
+command_version() {
+    echo "version v$VERSION"
+}
 
 main "$@"

@@ -1,0 +1,9 @@
+version <COMMANDS> [<OPTIONS>]
+
+<COMMANDS> ::= (init) "Initializes the version config file"
+             | (update) "Update the project version"
+             ;
+
+<OPTIONS> ::= (-h | --help) "Prints the help message"
+            | (-v | --version) "Prints the script's version"
+            ;
