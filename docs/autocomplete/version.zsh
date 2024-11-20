@@ -1,20 +1,21 @@
 #compdef version
 
 _version () {
-    local -a literals=("autocomplete" "generate" "man" "-h" "--version" "update" "--help" "init" "-v")
+    local -a literals=("--help" "autocomplete" "--version" "generate" "man" "ignored" "version" "-h" "update" "get" "--debug" "init" "-v")
 
     local -A descriptions
-    descriptions[2]="Generate various files"
-    descriptions[4]="Prints the help message"
-    descriptions[5]="Prints the script's version"
-    descriptions[6]="Update the project version"
-    descriptions[7]="Prints the help message"
-    descriptions[8]="Initializes the version config file"
-    descriptions[9]="Prints the script's version"
+    descriptions[4]="Generate various files"
+    descriptions[8]="Prints the help message"
+    descriptions[9]="Update the project version"
+    descriptions[10]="Get various values"
+    descriptions[11]="Set DEBUG to true"
+    descriptions[12]="Initializes the version config file"
+    descriptions[13]="Prints the script's version"
 
     local -A literal_transitions
-    literal_transitions[1]="([8]=2 [6]=2 [7]=2 [2]=3 [4]=2 [5]=2 [9]=2)"
-    literal_transitions[3]="([1]=2 [3]=2)"
+    literal_transitions[1]="([1]=2 [3]=2 [4]=3 [8]=2 [11]=2 [9]=2 [10]=4 [12]=2 [13]=2)"
+    literal_transitions[3]="([2]=2 [5]=2)"
+    literal_transitions[4]="([6]=2 [7]=2)"
 
     local -A match_anything_transitions
     match_anything_transitions=()
@@ -53,12 +54,16 @@ _version () {
 
         return 1
     done
-    declare -A literal_transitions_level_0=([3]="1 3" [1]="8 6 7 2 4 5 9")
+    declare -A literal_transitions_level_0=([3]="2 5" [1]="4 8 11 9 10 12 13" [4]="6 7")
+    declare -A literal_transitions_level_1=([1]="1 3")
     declare -A subword_transitions_level_0=()
+    declare -A subword_transitions_level_1=()
     declare -A commands_level_0=()
+    declare -A commands_level_1=()
     declare -A specialized_commands_level_0=()
+    declare -A specialized_commands_level_1=()
 
-     local max_fallback_level=0
+     local max_fallback_level=1
      for (( fallback_level=0; fallback_level <= max_fallback_level; fallback_level++ )) {
          completions_no_description_trailing_space=()
          completions_no_description_no_trailing_space=()

@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
+
+DEBUG=false
+
 main() {
+    if [ -f "$VERSION_CONFIG_FILE" ]; then
+        source "$VERSION_CONFIG_FILE"
+    fi
+
     if [ "$#" == 0 ]; then
-        ERRO "A command or an option  is always expected" >&2
+        ERRO "A command or an option is always expected" >&2
         command_help
         exit 1
     fi
@@ -16,6 +23,10 @@ main() {
                 ;;
             -v|--version) 
                 command_version 
+                shift
+                ;;
+            --debug)
+                DEBUG=true
                 shift
                 ;;
             "init")
@@ -32,20 +43,25 @@ main() {
                 command_generate "$1"
                 shift
                 ;;
+            "get")
+                shift
+                command_get "$1"
+                shift
+                ;;
             *)
-                echo "Unknown command: $arg" >&2
+                echo "Unknown command/option: $arg" >&2
                 command_help
                 exit 1
         esac
     done
 }
 
-# Config
+# Config -----------*\
 
-VERSION_FILE=".version.conf"
+VERSION_CONFIG_FILE=".version-conf"
 VERSION="0.1.0"
 
-# Logging
+# Logging -----------*\
 
 LOG () {
     echo "[$1] $2"
@@ -60,53 +76,124 @@ WARN () {
     LOG "WARN" "$1"
 }
 DEBU () {
-    LOG "DEBU" "$1"
+    if [ $DEBUG == true ]; then
+        LOG "DEBU" "$1"
+    fi
+
 }
 
-# Utils
+# Utils -----------*\
 
 list_files() {
     local gitignore_file=".gitignore"
     local ignored=("$@")
 
-    # Add patterns from .gitignore if it exists
     if [[ -f "$gitignore_file" ]]; then
         while IFS= read -r line || [[ -n "$line" ]]; do
-            [[ -z "$line" || "$line" == \#* ]] && continue
+            if [[ -z "$line" || "$line" == \#* || "$line" == "$VERSION_CONFIG_FILE" ]]; then
+                continue
+            fi
             ignored+=("$line")
         done < "$gitignore_file"
     fi
 
     ignored+=(".git")
+    ignored+=("${ignore[@]}")
 
-    # Build the find command
     local find_command="find . -type f"
 
     for ignore in "${ignored[@]}"; do
-        # Handle patterns that are directories or general patterns
         find_command+=" -not -path './$ignore' -not -path './$ignore/*'"
     done
 
     eval "$find_command"
 }
 
-# Commands
+lognexec() {
+    echo "$@"
+    "$@" || {
+        echo "Command failed: " "$@" >&2
+        exit 1
+    }
+}
+
+is_semver() {
+    local version="$1"
+    local semver_regex="^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*|(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$"
+
+    if [[ "$version" =~ $semver_regex ]]; then
+        return 0 # Valid
+    else
+        return 1 # Invalid
+    fi
+}
+
+update_version_in_files() {
+    local new_version="$1"
+    shift
+    local files=("$@")
+
+    if ! is_semver "$new_version"; then
+        echo "Error: '$new_version' is not a valid Semantic Version." >&2
+        return 1
+    fi
+
+    local version_regex="[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-.]+)?(\+[a-zA-Z0-9-.]+)?"
+
+    for file in "${files[@]}"; do
+        if [[ ! -f "$file" ]]; then
+            WARN "File '$file' does not exist, skipping." >&2
+            continue
+        fi
+
+        version_found=$(grep -oP "$version_regex" "$file" | head -n 1)
+
+        if [[ -n "$version_found" ]]; then
+            sed -i.bak -E "s/$version_found/$new_version/" "$file"
+            if [[ $? -eq 0 ]]; then
+                # If the version was successfully replaced, delete the .bak file
+                rm -f "$file.bak"
+                INFO "Updated version in '$file' to '$new_version'."
+            else
+                ERRO "Failed to update version in '$file'." >&2
+            fi
+        else
+            DEBU "No version found in '$file', skipping." >&2
+        fi
+    done
+}
+
+# Commands -----------*\
 
 command_init() {
-    if [[ -f "$VERSION_FILE" ]]; then
-        ERRO "$VERSION_FILE already exists in this directory"
+    if [[ -f "$VERSION_CONFIG_FILE" ]]; then
+        ERRO "$VERSION_CONFIG_FILE already exists in this directory"
     else 
-        touch "$VERSION_FILE"
-        INFO "$VERSION_FILE created"
+        printf "#!/usr/bin/env bash\n\ncurrent_version=0.0.0\n\nignore=(\n\n)" > "$VERSION_CONFIG_FILE"
+
+        INFO "$VERSION_CONFIG_FILE created"
     fi
 }
 
 command_update() {
-    version="$1"
-    files=$(list_files)
+    local version="$1"
+
+    if [[ -z "$version" ]]; then
+        ERRO "<VERSION> needs to be specified" >&2
+        exit 1
+    fi
+
+    if ! is_semver "$version"; then
+        ERRO "$version doesn't follow the Semantic Versioning format" >&2
+        exit 1
+    fi
 
     DEBU "new version: $version"
-    echo "$files"
+
+    files=$(list_files)
+    readarray -t file_array <<< "$files"
+
+    update_version_in_files "$version" "${file_array[@]}"
 }
 
 command_help() {
@@ -116,12 +203,14 @@ USAGE
 
 COMMANDS
     init                Initializes the version config file
-    update              Update the project version
-    generate            Generate various files for the tool
+    update <VERSION>    Update the project version
+    generate <VALUE>    Generate various files for the tool
+    get <VALUE>         Get various values
 
 OPTIONS
     -h --help           Prints this message
     -v --version        Prints the version tool's version
+    --debug             Set debug mode to true
 
 Made by KDesp73 <despoinidisk@gmail.com>
 EOF
@@ -136,9 +225,9 @@ command_generate() {
             BASH_AUTOCOMPLETE_PATH="/etc/bash_completion.d/version.bash"
             ZSH_AUTOCOMPLETE_PATH="/usr/share/zsh/functions/Completion/_version"
             FISH_AUTOCOMPLETE_PATH="/etc/fish/conf.d/version.fish"
-            curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.zsh -o "$ZSH_AUTOCOMPLETE_PATH"
-            curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.bash -o "$BASH_AUTOCOMPLETE_PATH"
-            curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.fish -o "$FISH_AUTOCOMPLETE_PATH"
+            lognexec sudo curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.zsh -o "$ZSH_AUTOCOMPLETE_PATH"
+            lognexec sudo curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.bash -o "$BASH_AUTOCOMPLETE_PATH"
+            lognexec sudo curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.fish -o "$FISH_AUTOCOMPLETE_PATH"
             ;;
         "man")
             ERRO "Not implemented yet."
@@ -151,6 +240,24 @@ command_generate() {
 
 command_version() {
     echo "version v$VERSION"
+}
+
+command_get() {
+    value="$1"
+
+    case "$value" in
+        "version")
+            echo "$current_version"
+            ;;
+        "ignored")
+            for item in "${ignore[@]}"; do
+                echo "$item"
+            done
+            ;;
+        *)
+            ERRO "Unknown value: $value"
+            exit 1
+    esac
 }
 
 main "$@"

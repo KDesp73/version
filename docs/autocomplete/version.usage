@@ -3,10 +3,13 @@ version <COMMANDS> | [<OPTIONS>];
 <COMMANDS> ::= (init) "Initializes the version config file"
              | (update) "Update the project version"
              | (generate <GENERATE-VALUES>) "Generate various files"
+             | (get <GET-VALUES>) "Get various values"
              ;
 
 <GENERATE-VALUES> ::= (autocomplete | man);
+<GET-VALUES> ::= (version | ignored);
 
-<OPTIONS> ::= (-h | --help) "Prints the help message"
-            | (-v | --version) "Prints the script's version"
+<OPTIONS> ::= (-h || --help) "Prints the help message"
+            | (-v || --version) "Prints the script's version"
+            | (--debug) "Set DEBUG to true"
             ;
