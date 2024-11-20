@@ -27,6 +27,11 @@ main() {
                 command_update "$1"
                 shift
                 ;;
+            "generate")
+                shift
+                command_generate "$1"
+                shift
+                ;;
             *)
                 echo "Unknown command: $arg" >&2
                 command_help
@@ -112,6 +117,7 @@ USAGE
 COMMANDS
     init                Initializes the version config file
     update              Update the project version
+    generate            Generate various files for the tool
 
 OPTIONS
     -h --help           Prints this message
@@ -119,6 +125,28 @@ OPTIONS
 
 Made by KDesp73 <despoinidisk@gmail.com>
 EOF
+}
+
+command_generate() { 
+    value="$1"
+    INFO "Generating $1...";
+
+    case "$value" in
+        "autocomplete")
+            BASH_AUTOCOMPLETE_PATH="/etc/bash_completion.d/version.bash"
+            ZSH_AUTOCOMPLETE_PATH="/usr/share/zsh/functions/Completion/_version"
+            FISH_AUTOCOMPLETE_PATH="/etc/fish/conf.d/version.fish"
+            curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.zsh -o "$ZSH_AUTOCOMPLETE_PATH"
+            curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.bash -o "$BASH_AUTOCOMPLETE_PATH"
+            curl -s https://raw.githubusercontent.com/KDesp73/version/main/docs/autocomplete/version.fish -o "$FISH_AUTOCOMPLETE_PATH"
+            ;;
+        "man")
+            ERRO "Not implemented yet."
+            ;;
+        *)
+            ERRO "Unknown value: $value"
+            exit 1
+    esac
 }
 
 command_version() {

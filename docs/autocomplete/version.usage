@@ -1,8 +1,11 @@
-version <COMMANDS> [<OPTIONS>]
+version <COMMANDS> | [<OPTIONS>];
 
 <COMMANDS> ::= (init) "Initializes the version config file"
              | (update) "Update the project version"
+             | (generate <GENERATE-VALUES>) "Generate various files"
              ;
+
+<GENERATE-VALUES> ::= (autocomplete | man)
 
 <OPTIONS> ::= (-h | --help) "Prints the help message"
             | (-v | --version) "Prints the script's version"
