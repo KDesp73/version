@@ -149,9 +149,13 @@ update_version_in_files() {
         version_found=$(grep -oP "$version_regex" "$file" | head -n 1)
 
         if [[ -n "$version_found" ]]; then
+            if [[ "$version_found" != "$current_version" ]]; then
+                DEBU "Version in '$file' ($version_found) does not match current version ($current_version), skipping." >&2
+                continue
+            fi
+
             sed -i.bak -E "s/$version_found/$new_version/" "$file"
             if [[ $? -eq 0 ]]; then
-                # If the version was successfully replaced, delete the .bak file
                 rm -f "$file.bak"
                 INFO "Updated version in '$file' to '$new_version'."
             else

@@ -1,1 +1,1 @@
-TODO: update command
+TODO: preview command
