@@ -62,7 +62,7 @@ main() {
 # Config -----------*\
 
 VERSION_CONFIG_FILE=".version-conf"
-VERSION="0.1.0"
+VERSION="0.1.1"
 
 # Logging -----------*\
 
@@ -150,24 +150,30 @@ update_version_in_files() {
             continue
         fi
 
-        version_found=$(grep -oP "$version_regex" "$file" | head -n 1)
+        # Find all matches and process each one
+        mapfile -t versions_found < <(grep -oP "$version_regex" "$file")
 
-        if [[ -n "$version_found" ]]; then
+        if [[ ${#versions_found[@]} -eq 0 ]]; then
+            DEBU "No version found in '$file', skipping." >&2
+            continue
+        fi
+
+        for version_found in "${versions_found[@]}"; do
             if [[ "$version_found" != "$current_version" ]]; then
-                DEBU "Version in '$file' ($version_found) does not match current version ($current_version), skipping." >&2
+                DEBU "Version in '$file' ($version_found) does not match current version ($current_version), skipping this match." >&2
                 continue
             fi
 
+            # Update the version and stop further processing for this file
             sed -i.bak -E "s/$version_found/$new_version/" "$file"
             if [[ $? -eq 0 ]]; then
                 rm -f "$file.bak"
                 INFO "Updated version in '$file' to '$new_version'."
+                break
             else
                 ERRO "Failed to update version in '$file'." >&2
             fi
-        else
-            DEBU "No version found in '$file', skipping." >&2
-        fi
+        done
     done
 }
 
