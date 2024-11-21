@@ -9,7 +9,7 @@ function _version
         set COMP_CWORD (count $COMP_WORDS)
     end
 
-    set literals "--help" "autocomplete" "--version" "generate" "man" "ignored" "version" "-h" "update" "get" "--debug" "init" "-v"
+    set literals "--help" "autocomplete" "--version" "generate" "man" "ignored" "version" "-h" "update" "get" "--debug" "list" "init" "-v"
 
     set descriptions
     set descriptions[4] "Generate various files"
@@ -17,11 +17,12 @@ function _version
     set descriptions[9] "Update the project version"
     set descriptions[10] "Get various values"
     set descriptions[11] "Set DEBUG to true"
-    set descriptions[12] "Initializes the version config file"
-    set descriptions[13] "Prints the script's version"
+    set descriptions[12] "Lists the files that will possibly change"
+    set descriptions[13] "Initializes the version config file"
+    set descriptions[14] "Prints the script's version"
 
     set literal_transitions
-    set literal_transitions[1] "set inputs 1 3 4 8 11 9 10 12 13; set tos 2 2 3 2 2 2 4 2 2"
+    set literal_transitions[1] "set inputs 1 3 4 8 11 9 10 12 13 14; set tos 2 2 3 2 2 2 4 2 2 2"
     set literal_transitions[3] "set inputs 2 5; set tos 2 2"
     set literal_transitions[4] "set inputs 6 7; set tos 2 2"
 

@@ -47,6 +47,10 @@ main() {
                 command_get "$1"
                 shift
                 ;;
+            "list")
+                command_list
+                shift
+                ;;
             *)
                 echo "Unknown command/option: $arg" >&2
                 command_help
@@ -85,7 +89,7 @@ DEBU () {
 
 list_files() {
     local gitignore_file=".gitignore"
-    local ignored=("$@")
+    local ignored=()
 
     if [[ -f "$gitignore_file" ]]; then
         while IFS= read -r line || [[ -n "$line" ]]; do
@@ -210,6 +214,7 @@ COMMANDS
     update <VERSION>    Update the project version
     generate <VALUE>    Generate various files for the tool
     get <VALUE>         Get various values
+    list                Lists the files that will possibly change
 
 OPTIONS
     -h --help           Prints this message
@@ -262,6 +267,10 @@ command_get() {
             ERRO "Unknown value: $value"
             exit 1
     esac
+}
+
+command_list() {
+    list_files
 }
 
 main "$@"

@@ -7,9 +7,9 @@ _version () {
     local words cword
     _get_comp_words_by_ref -n "$COMP_WORDBREAKS" words cword
 
-    declare -a literals=(--help autocomplete --version generate man ignored version -h update get --debug init -v)
+    declare -a literals=(--help autocomplete --version generate man ignored version -h update get --debug list init -v)
     declare -A literal_transitions=()
-    literal_transitions[0]="([0]=1 [2]=1 [3]=2 [7]=1 [10]=1 [8]=1 [9]=3 [11]=1 [12]=1)"
+    literal_transitions[0]="([0]=1 [2]=1 [3]=2 [7]=1 [10]=1 [8]=1 [9]=3 [11]=1 [12]=1 [13]=1)"
     literal_transitions[2]="([1]=1 [4]=1)"
     literal_transitions[3]="([5]=1 [6]=1)"
     declare -A match_anything_transitions=()
@@ -49,7 +49,7 @@ _version () {
         return 1
     done
 
-    declare -A literal_transitions_level_0=([2]="1 4" [0]="3 7 10 8 9 11 12" [3]="5 6")
+    declare -A literal_transitions_level_0=([2]="1 4" [0]="3 7 10 8 9 11 12 13" [3]="5 6")
     declare -A literal_transitions_level_1=([0]="0 2")
     declare -A subword_transitions_level_0=()
     declare -A subword_transitions_level_1=()

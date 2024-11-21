@@ -4,6 +4,7 @@ version <COMMANDS> | [<OPTIONS>];
              | (update) "Update the project version"
              | (generate <GENERATE-VALUES>) "Generate various files"
              | (get <GET-VALUES>) "Get various values"
+             | (list) "Lists the files that will possibly change"
              ;
 
 <GENERATE-VALUES> ::= (autocomplete | man);
