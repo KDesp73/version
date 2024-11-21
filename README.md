@@ -1,6 +1,6 @@
 # version
 
-Current version: 0.1.1
+Small bash script to update your project's version using only one command 
 
 ## Config file `.version-conf`
 
@@ -23,3 +23,7 @@ want to be included in the search-and-replace procedure
 * By default anything in the `.gitignore` file is also being ignored by the tool
 
 * The .git directory and the CHANGELOG.md file are also being ignored by default
+
+## License
+
+[MIT](./LICENSE)
